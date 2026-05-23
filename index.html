@@ -1,0 +1,1209 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>АнтиПрокрастинация</title>
+<style>
+:root{
+--bg-dark: linear-gradient(135deg,#1e1e2f,#12121c);
+--text-light:#0f172a;
+--text-dark:#f1f5f9;
+--card-light:#fff;
+--card-dark:#1f1f2e;
+--accent:#6366f1;
+--accent-hover:#4f46e5;
+--success:#10b981;
+--warning:#f59e0b;
+--danger:#ef4444;
+--purple:#a855f7;
+--pink:#ec4899;
+--cyan:#06b6d4;
+--shadow:0 20px 40px rgba(0,0,0,0.1);
+--shadow-hover:0 30px 60px rgba(99,102,241,0.4);
+--ease-elastic: cubic-bezier(0.34, 1.56, 0.64, 1);
+--ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+--ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+--ease-ultra: cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+*{box-sizing:border-box}
+
+body{
+margin:0;
+font-family:Segoe UI,system-ui,-apple-system,sans-serif;
+background:var(--bg-dark);
+color:var(--text-dark);
+transition:background 1.2s var(--ease-ultra),color 1.2s var(--ease-ultra);
+overflow-x:hidden;
+line-height:1.6;
+min-height:100vh;
+scroll-behavior:smooth;
+}
+
+body.light{
+background:#f8fafc;
+color:var(--text-light);
+}
+
+/* === ФОНОВЫЕ ИЗОБРАЖЕНИЯ === */
+.home-bg{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+z-index:-1;
+overflow:hidden;
+transition:opacity 1.2s var(--ease-ultra);
+}
+
+.bg-dark-image{
+position:absolute;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background: 
+radial-gradient(2px 2px at 20% 30%, rgba(255,255,255,0.8) 50%, transparent 50%),
+radial-gradient(2px 2px at 40% 70%, rgba(255,255,255,0.6) 50%, transparent 50%),
+radial-gradient(1px 1px at 60% 40%, rgba(255,255,255,0.7) 50%, transparent 50%),
+radial-gradient(1px 1px at 80% 10%, rgba(255,255,255,0.5) 50%, transparent 50%),
+radial-gradient(2px 2px at 10% 80%, rgba(255,255,255,0.6) 50%, transparent 50%),
+radial-gradient(1px 1px at 30% 50%, rgba(255,255,255,0.8) 50%, transparent 50%),
+radial-gradient(2px 2px at 50% 90%, rgba(255,255,255,0.7) 50%, transparent 50%),
+radial-gradient(1px 1px at 70% 60%, rgba(255,255,255,0.6) 50%, transparent 50%),
+radial-gradient(2px 2px at 90% 20%, rgba(255,255,255,0.8) 50%, transparent 50%),
+linear-gradient(180deg, #0f172a 0%, #1e1e2f 50%, #12121c 100%);
+background-size: 200px 200px, 300px 300px, 150px 150px, 250px 250px, 180px 180px, 220px 220px, 280px 280px, 190px 190px, 240px 240px, 100% 100%;
+opacity:1;
+transition:opacity 1.2s var(--ease-ultra);
+}
+
+.bg-light-image{
+position:absolute;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background: 
+radial-gradient(ellipse at 20% 80%, rgba(99,102,241,0.15) 0%, transparent 50%),
+radial-gradient(ellipse at 80% 20%, rgba(168,85,247,0.15) 0%, transparent 50%),
+radial-gradient(ellipse at 40% 40%, rgba(236,72,153,0.1) 0%, transparent 50%),
+linear-gradient(180deg, #f8fafc 0%, #eef2ff 50%, #ffffff 100%);
+opacity:0;
+transition:opacity 1.2s var(--ease-ultra);
+}
+
+body.light .bg-dark-image{opacity:0;}
+body.light .bg-light-image{opacity:1;}
+
+/* === АНИМАЦИИ === */
+@keyframes fadeInUp{from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:translateY(0)}}
+@keyframes scaleIn{from{opacity:0;transform:scale(0.95)}to{opacity:1;transform:scale(1)}}
+@keyframes slideInLeft{from{opacity:0;transform:translateX(-50px)}to{opacity:1;transform:translateX(0)}}
+@keyframes slideInRight{from{opacity:0;transform:translateX(50px)}to{opacity:1;transform:translateX(0)}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+@keyframes shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(250%)}}
+@keyframes fall{to{transform:translateY(100vh) rotate(720deg);opacity:0}}
+@keyframes twinkle{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(0.8)}}
+@keyframes pulse-glow{0%,100%{box-shadow:0 0 20px rgba(99,102,241,0.4)}50%{box-shadow:0 0 40px rgba(99,102,241,0.8)}}
+@keyframes glow{0%,100%{filter:drop-shadow(0 0 5px rgba(99,102,241,0.5))}50%{filter:drop-shadow(0 0 20px rgba(99,102,241,0.8))}}
+@keyframes letter-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+@keyframes quoteFade{0%,100%{opacity:1;transform:translateY(0)}50%{opacity:0.7;transform:translateY(5px)}}
+@keyframes fadeRotate{0%{opacity:0;transform:rotate(-10deg)}100%{opacity:1;transform:rotate(0deg)}}
+@keyframes favoritesReveal{0%{opacity:0;transform:scale(0.9) translateY(30px);filter:blur(10px)}50%{opacity:0.5;transform:scale(0.95) translateY(15px);filter:blur(5px)}100%{opacity:1;transform:scale(1) translateY(0);filter:blur(0)}}
+@keyframes cardStagger{0%{opacity:0;transform:scale(0.8) translateY(40px)}100%{opacity:1;transform:scale(1) translateY(0)}}
+@keyframes modalSlideIn{0%{opacity:0;transform:scale(0.9) translateY(20px)}100%{opacity:1;transform:scale(1) translateY(0)}}
+@keyframes light-flash{0%,100%{opacity:0}50%{opacity:0.3}}
+
+.animate-in{animation:fadeInUp 1s var(--ease-ultra) forwards}
+.animate-in-delay-1{animation:fadeInUp 1s var(--ease-ultra) 0.2s forwards;opacity:0}
+.animate-in-delay-2{animation:fadeInUp 1s var(--ease-ultra) 0.4s forwards;opacity:0}
+.animate-in-delay-3{animation:fadeInUp 1s var(--ease-ultra) 0.6s forwards;opacity:0}
+
+.theme-wave{position:fixed;top:50%;left:50%;width:0;height:0;border-radius:50%;background:radial-gradient(circle,var(--accent),transparent);transform:translate(-50%,-50%);pointer-events:none;z-index:9999;}
+
+.progress-bar{position:fixed;top:0;left:0;height:4px;background:linear-gradient(90deg,var(--accent),#8b5cf6);width:20%;transition:width 0.8s var(--ease-ultra);z-index:1000;border-radius:0 2px 2px 0;box-shadow:0 0 15px var(--accent);}
+
+/* ===== ВЕРХНЯЯ ПАНЕЛЬ ===== */
+.top-bar{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:64px;
+background:rgba(15,23,42,0.9);
+backdrop-filter:blur(12px);
+-webkit-backdrop-filter:blur(12px);
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:0 clamp(12px,3vw,20px);
+z-index:2000;
+border-bottom:1px solid rgba(255,255,255,0.1);
+transition:background 0.6s var(--ease-ultra),border-color 0.6s var(--ease-ultra);
+}
+body.light .top-bar{background:rgba(255,255,255,0.95);border-bottom:1px solid rgba(0,0,0,0.1);}
+.top-bar-right{display:flex;align-items:center;gap:10px;}
+
+.screen{
+min-height:100vh;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+padding:clamp(16px,4vw,32px);
+padding-top:80px;
+transition:opacity 0.8s var(--ease-ultra),transform 0.8s var(--ease-ultra);
+}
+
+@supports (padding: max(0px)) {
+.screen{
+padding:max(16px,env(safe-area-inset-top)) 
+max(16px,env(safe-area-inset-right))
+max(16px,env(safe-area-inset-bottom))
+max(16px,env(safe-area-inset-left));
+padding-top:80px;
+}
+}
+
+.hidden{display:none !important;}
+
+h1{
+font-size:clamp(32px,6vw,56px);
+font-weight:800;
+text-align:center;
+line-height:1.1;
+margin:0 0 20px;
+background:linear-gradient(135deg,#6366f1,#a855f7,#ec4899);
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
+background-clip:text;
+letter-spacing:-1px;
+animation:glow 4s ease-in-out infinite;
+display:inline-block;
+}
+.letter{display:inline-block;transition:transform 0.4s var(--ease-elastic),color 0.4s ease;cursor:default;color:#6366f1 !important;-webkit-text-fill-color: #6366f1 !important;}
+.letter:hover{transform:translateY(-10px) scale(1.15);color:#06b6d4 !important;}
+
+h2{font-size:clamp(22px,3vw,32px);font-weight:700;margin:0 0 16px;color:var(--accent);transition:color 0.4s var(--ease-smooth);}
+
+.subtitle{font-size:clamp(17px,2.5vw,21px);max-width:700px;text-align:center;margin-bottom:40px;opacity:0.8;line-height:1.7;font-weight:300;transition:opacity 0.6s var(--ease-smooth);}
+
+.quote-container{max-width:650px;margin:20px auto 35px;padding:0;animation:scaleIn 1s var(--ease-ultra) 0.6s forwards;opacity:0;position:relative;}
+.quote-text{font-size:18px;font-style:italic;line-height:1.8;text-align:center;margin:0 0 10px 0;opacity:0.85;font-weight:300;transition:opacity 0.7s var(--ease-ultra),transform 0.7s var(--ease-ultra);color:inherit;}
+.quote-text.fade{opacity:0;transform:translateY(10px);}
+.quote-author{font-size:13px;text-align:center;opacity:0.6;font-weight:500;letter-spacing:0.5px;transition:opacity 0.6s var(--ease-smooth);color:inherit;}
+.quote-dots{display:flex;justify-content:center;gap:6px;margin-top:16px;}
+.quote-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);opacity:0.3;transition:opacity 0.4s ease,transform 0.4s var(--ease-elastic);}
+.quote-dot.active{opacity:1;transform:scale(1.4);}
+
+.big-btn{
+padding:18px 36px;margin:12px 0;font-size:clamp(17px,2vw,21px);border:none;border-radius:20px;cursor:pointer;background:linear-gradient(135deg,var(--accent),#8b5cf6);background-size:200% auto;color:white !important;transition:all 0.5s var(--ease-elastic);box-shadow:0 8px 20px rgba(99,102,241,0.4);font-weight:600;min-height:64px;display:flex;align-items:center;justify-content:center;gap:12px;position:relative;overflow:hidden;
+}
+.big-btn::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.3),transparent);transition:left 0.7s ease;}
+.big-btn:hover::before{left:100%;}
+.big-btn:hover{transform:translateY(-6px) scale(1.05);box-shadow:var(--shadow-hover);background-position:right center;}
+.big-btn:active{transform:scale(0.97) translateY(0);}
+
+.card{
+background:var(--card-dark);padding:clamp(24px,5vw,48px);border-radius:32px;box-shadow:var(--shadow);width:100%;max-width:680px;margin-top:24px;transition:all 0.6s var(--ease-ultra);display:flex;flex-direction:column;gap:24px;border:1px solid rgba(255,255,255,0.1);animation:scaleIn 0.8s var(--ease-elastic);backdrop-filter: blur(10px);
+}
+body.light .card{background:var(--card-light);border-color:rgba(255,255,255,0.2);}
+.card:hover{box-shadow:0 25px 50px rgba(0,0,0,0.15);transform:translateY(-5px);}
+
+.survey-question{margin-bottom:28px;animation:slideInLeft 0.7s var(--ease-ultra);}
+.survey-question h3{font-size:19px;margin-bottom:20px;color:var(--accent);font-weight:600;transition:color 0.4s ease;}
+.survey-options{display:flex;flex-direction:column;gap:12px;}
+.survey-option{display:flex;align-items:center;gap:16px;padding:18px 20px;border:2px solid rgba(99,102,241,0.2);border-radius:16px;cursor:pointer;transition:all 0.4s var(--ease-ultra);background:rgba(255,255,255,0.05);}
+body.light .survey-option{background:rgba(255,255,255,0.5);border-color:rgba(99,102,241,0.1);}
+.survey-option:hover{border-color:var(--accent);background:rgba(99,102,241,0.1);transform:translateX(8px);}
+.survey-option.selected{border-color:var(--accent);background:rgba(99,102,241,0.15);box-shadow:0 0 0 4px rgba(99,102,241,0.2);transform:translateX(8px);}
+.survey-option input{width:22px;height:22px;accent-color:var(--accent);cursor:pointer;transition:transform 0.3s ease;}
+.survey-option label{flex:1;cursor:pointer;font-size:17px;font-weight:500;transition:color 0.3s ease;}
+
+.checkbox-group{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;}
+.checkbox-option{display:flex;align-items:center;gap:12px;padding:16px;border:2px solid rgba(99,102,241,0.2);border-radius:16px;cursor:pointer;transition:all 0.4s var(--ease-ultra);background:rgba(255,255,255,0.05);}
+body.light .checkbox-option{background:rgba(255,255,255,0.5);border-color:rgba(99,102,241,0.1);}
+.checkbox-option:hover{border-color:var(--accent);transform:translateY(-3px);}
+.checkbox-option.selected{border-color:var(--accent);background:rgba(99,102,241,0.15);box-shadow:0 4px 15px rgba(99,102,241,0.2);}
+.checkbox-option input{width:20px;height:20px;accent-color:var(--accent);}
+
+.stats-container{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:20px;margin:24px 0;}
+.stat-card{background:linear-gradient(135deg,rgba(99,102,241,0.15),rgba(139,92,246,0.15));padding:20px;border-radius:20px;text-align:center;border:1px solid rgba(99,102,241,0.2);transition:all 0.5s var(--ease-elastic);animation:scaleIn 0.8s var(--ease-smooth);}
+.stat-card:hover{transform:translateY(-8px) scale(1.05);box-shadow:0 15px 35px rgba(99,102,241,0.3);}
+.stat-number{font-size:36px;font-weight:800;color:var(--accent);display:block;transition:color 0.4s ease;}
+.stat-label{font-size:14px;opacity:0.8;margin-top:8px;display:block;font-weight:500;}
+
+.survey-progress{width:100%;height:8px;background:rgba(99,102,241,0.1);border-radius:10px;overflow:hidden;margin-bottom:24px;}
+.survey-progress-bar{height:100%;background:linear-gradient(90deg,var(--accent),#a855f7);width:0%;transition:width 0.8s var(--ease-ultra);border-radius:10px;box-shadow:0 0 15px var(--accent);}
+
+.profile-result{background:linear-gradient(135deg,rgba(99,102,241,0.1),rgba(139,92,246,0.1));padding:28px;border-radius:24px;border-left:5px solid var(--accent);margin-top:20px;animation:slideInRight 0.8s var(--ease-ultra);}
+.profile-result h3{margin:0 0 16px;color:var(--accent);font-size:20px;}
+.profile-result ul{margin:16px 0;padding-left:24px;}
+.profile-result li{margin:10px 0;line-height:1.7;}
+
+.split-container{display:grid;grid-template-columns:1fr 1fr;gap:32px;width:100%;max-width:1200px;margin:0 auto;align-items:start;}
+.problems-panel{background:var(--card-dark);padding:28px;border-radius:28px;box-shadow:var(--shadow);border:1px solid rgba(255,255,255,0.1);max-height:75vh;overflow-y:auto;animation:slideInLeft 0.8s var(--ease-ultra);backdrop-filter: blur(10px);}
+body.light .problems-panel{background:var(--card-light);border-color:rgba(255,255,255,0.2);}
+.problems-panel h2{position:sticky;top:0;background:var(--card-dark);padding:0 0 20px 0;margin:0 0 20px 0;z-index:10;backdrop-filter: blur(10px);}
+body.light .problems-panel h2{background:var(--card-light);}
+.problem-list{display:flex;flex-direction:column;gap:12px;}
+.problem-item{display:flex;align-items:center;gap:16px;padding:18px 20px;border:2px solid rgba(99,102,241,0.2);border-radius:20px;cursor:pointer;transition:all 0.4s var(--ease-ultra);background:rgba(255,255,255,0.05);font-size:16px;font-weight:500;animation:fadeInUp 0.5s var(--ease-smooth) forwards;opacity:0;}
+body.light .problem-item{background:rgba(255,255,255,0.5);border-color:rgba(99,102,241,0.1);}
+.problem-item:hover{border-color:var(--accent);transform:translateX(8px);box-shadow:0 8px 25px rgba(99,102,241,0.2);background:rgba(99,102,241,0.1);}
+.problem-item.active{border-color:var(--accent);background:linear-gradient(135deg,rgba(99,102,241,0.2),rgba(139,92,246,0.2));box-shadow:0 0 0 4px rgba(99,102,241,0.2);transform:translateX(8px);}
+.problem-item .icon{font-size:24px;transition:transform 0.4s var(--ease-elastic);}
+.problem-item:hover .icon{transform:scale(1.25) rotate(12deg);}
+
+.answer-panel{background:var(--card-dark);padding:40px;border-radius:28px;box-shadow:var(--shadow);border:1px solid rgba(255,255,255,0.1);position:sticky;top:32px;min-height:500px;display:flex;flex-direction:column;justify-content:center;animation:slideInRight 0.8s var(--ease-ultra);backdrop-filter: blur(10px);}
+body.light .answer-panel{background:var(--card-light);border-color:rgba(255,255,255,0.2);}
+.answer-placeholder{text-align:center;opacity:0.6;padding:40px 20px;}
+.answer-placeholder .icon{font-size:80px;display:block;margin-bottom:24px;animation:float 3s ease-in-out infinite;filter: drop-shadow(0 10px 20px rgba(99,102,241,0.3));}
+.answer-content{opacity:0;transform:translateY(20px);transition:opacity 0.6s var(--ease-ultra),transform 0.6s var(--ease-ultra);}
+.answer-content.show{opacity:1;transform:translateY(0);}
+.answer-header{display:flex;align-items:center;gap:16px;margin-bottom:24px;padding-bottom:20px;border-bottom:2px solid rgba(99,102,241,0.2);}
+.answer-header .icon{font-size:40px;animation:scaleIn 0.6s var(--ease-elastic);}
+.answer-header h3{margin:0;font-size:26px;color:var(--accent);font-weight:700;}
+.answer-body{font-size:17px;line-height:1.8;}
+.answer-body p{margin:16px 0;}
+.answer-body strong{color:var(--accent);font-weight:600;}
+
+.action-buttons{display:flex;gap:12px;flex-wrap:wrap;margin-top:28px;}
+.copy-btn,.favorite-btn{padding:14px 24px;font-size:15px;background:transparent;border:2px solid var(--accent);color:var(--accent);border-radius:16px;cursor:pointer;transition:all 0.4s var(--ease-elastic);font-weight:600;display:flex;align-items:center;gap:8px;}
+.copy-btn:hover,.favorite-btn:hover{background:var(--accent);color:white;transform:translateY(-3px);box-shadow:0 8px 20px rgba(99,102,241,0.3);}
+.copy-btn.copied{background:var(--success);border-color:var(--success);color:white;}
+.favorite-btn.active{background:var(--warning);border-color:var(--warning);color:white;box-shadow:0 8px 20px rgba(245,158,11,0.3);}
+
+.search-box{position:sticky;top:0;background:var(--card-dark);padding:0 0 20px 0;z-index:10;backdrop-filter: blur(10px);}
+body.light .search-box{background:var(--card-light);}
+.search-box input{width:100%;padding:16px 20px;font-size:17px;border-radius:16px;border:2px solid rgba(99,102,241,0.2);background:rgba(255,255,255,0.05);color:inherit;transition:all 0.4s var(--ease-ultra);}
+body.light .search-box input{background:rgba(255,255,255,0.5);border-color:rgba(99,102,241,0.1);}
+.search-box input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 4px rgba(99,102,241,0.15);background:rgba(255,255,255,0.08);transform:scale(1.02);}
+body.light .search-box input:focus{background:rgba(255,255,255,0.8);}
+
+/* КНОПКИ ПАНЕЛИ */
+.help-btn{padding:8px 14px;border-radius:10px;background:transparent;color:var(--text-dark);border:2px solid rgba(99,102,241,0.3);cursor:pointer;display:flex;align-items:center;gap:6px;font-size:14px;font-weight:600;transition:all 0.3s var(--ease-elastic);white-space:nowrap;}
+body.light .help-btn{color:var(--text-light);}
+.help-btn:hover{transform:translateY(-2px);background:rgba(99,102,241,0.15);}
+.help-btn:active{transform:scale(0.95);}
+
+.timer-btn-global{
+position:fixed;
+right:clamp(12px,3vw,30px);
+bottom:clamp(12px,3vw,30px);
+width:56px;
+height:56px;
+border-radius:50%;
+background:var(--card-dark);
+color:var(--accent);
+border:2px solid rgba(99,102,241,0.2);
+cursor:pointer;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:26px;
+transition:all 0.5s var(--ease-elastic);
+box-shadow:0 6px 20px rgba(99,102,241,0.2);
+z-index:1500;
+animation:float 4s ease-in-out infinite;
+}
+body.light .timer-btn-global{background:var(--card-light);border-color:rgba(99,102,241,0.2);}
+.timer-btn-global:hover{transform:scale(1.15) rotate(-15deg);box-shadow:0 10px 30px rgba(99,102,241,0.4);background:var(--accent);color:white;}
+.timer-btn-global:active{transform:scale(0.9);}
+
+.theme-toggle-btn{width:44px;height:44px;border-radius:50%;background:transparent;border:2px solid rgba(99,102,241,0.3);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.5s var(--ease-elastic);font-size:22px;}
+.theme-toggle-btn:hover{transform:scale(1.15) rotate(15deg);background:rgba(99,102,241,0.15);}
+.theme-toggle-btn:active{transform:scale(0.95);}
+
+.info-btn-panel{
+width:40px;height:40px;border-radius:50%;background:var(--accent);color:white;border:none;display:flex;justify-content:center;align-items:center;cursor:pointer;font-weight:700;font-size:18px;transition:transform 0.4s var(--ease-elastic),box-shadow 0.4s ease;box-shadow:0 4px 15px rgba(99,102,241,0.4);
+}
+.info-btn-panel:hover{transform:scale(1.15);box-shadow:0 8px 25px rgba(99,102,241,0.6);}
+.info-btn-panel:active{transform:scale(0.9);}
+
+.light-flash{position:fixed;top:0;left:0;width:100%;height:100%;background:white;opacity:0;pointer-events:none;z-index:9998;}
+.light-flash.active{animation:light-flash 0.3s ease-out;}
+
+.modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(15,23,42,0.8);backdrop-filter: blur(12px);-webkit-backdrop-filter: blur(12px);z-index:3000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.4s var(--ease-smooth);}
+.modal-overlay.active{opacity:1;pointer-events:all;}
+
+.modal-content{background:var(--card-dark);padding:40px;border-radius:24px;width:90%;max-width:700px;box-shadow:0 30px 80px rgba(0,0,0,0.4);transform:scale(0.9) translateY(20px);transition:transform 0.5s var(--ease-elastic);border:1px solid rgba(255,255,255,0.1);position:relative;max-height:90vh;overflow-y:auto;animation:modalSlideIn 0.5s var(--ease-elastic);}
+body.light .modal-content{background:var(--card-light);border-color:rgba(255,255,255,0.2);}
+
+.modal-close-btn{position:absolute;top:16px;right:16px;width:32px;height:32px;border-radius:50%;border:none;background:rgba(99,102,241,0.1);color:var(--accent);cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;transition:all 0.3s ease;}
+.modal-close-btn:hover{background:var(--danger);color:white;transform:rotate(90deg);}
+
+.modal-title{font-size:24px;font-weight:700;color:var(--accent);margin:0 0 16px 0;text-align:center;}
+.modal-body{font-size:15px;line-height:1.7;opacity:0.9;text-align:center;margin-bottom:24px;}
+.modal-buttons{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
+.modal-btn{padding:12px 24px;border-radius:12px;border:none;cursor:pointer;font-size:15px;font-weight:600;transition:all 0.3s var(--ease-elastic);}
+.modal-btn.primary{background:linear-gradient(135deg,var(--accent),#8b5cf6);color:white;box-shadow:0 4px 15px rgba(99,102,241,0.4);}
+.modal-btn.primary:hover{transform:translateY(-2px) scale(1.05);box-shadow:0 8px 25px rgba(99,102,241,0.6);}
+.modal-btn.secondary{background:transparent;border:2px solid rgba(99,102,241,0.3);color:var(--accent);}
+.modal-btn.secondary:hover{background:var(--accent);color:white;transform:translateY(-2px);}
+
+.glossary-section{margin-top:24px;padding-top:24px;border-top:2px solid rgba(99,102,241,0.2);}
+.glossary-section h3{color:var(--accent);margin-bottom:16px;font-size:18px;}
+.glossary-item{background:rgba(99,102,241,0.05);padding:12px 16px;border-radius:12px;margin:8px 0;text-align:left;border-left:3px solid var(--accent);}
+.glossary-term{font-weight:700;color:var(--accent);display:block;margin-bottom:4px;}
+.glossary-definition{font-size:14px;opacity:0.9;line-height:1.6;}
+
+.timer-modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(15,23,42,0.6);backdrop-filter: blur(12px);-webkit-backdrop-filter: blur(12px);z-index:2500;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.5s var(--ease-ultra);}
+.timer-modal-overlay.active{opacity:1;pointer-events:all;}
+
+.timer-modal-content{background:var(--card-dark);padding:40px;border-radius:32px;width:90%;max-width:480px;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,0.3);transform:scale(0.9) translateY(20px);transition:transform 0.6s var(--ease-elastic);border:1px solid rgba(255,255,255,0.1);position:relative;max-height:90vh;overflow-y:auto;}
+body.light .timer-modal-content{background:var(--card-light);border-color:rgba(255,255,255,0.2);}
+.timer-modal-overlay.active .timer-modal-content{transform:scale(1) translateY(0);}
+
+.timer-modal-close{position:absolute;top:20px;right:20px;width:36px;height:36px;border-radius:50%;border:none;background:rgba(99,102,241,0.1);color:var(--accent);cursor:pointer;font-size:20px;display:flex;align-items:center;justify-content:center;transition:all 0.3s var(--ease-elastic);}
+.timer-modal-close:hover{background:var(--danger);color:white;transform:rotate(90deg);}
+
+.pomodoro-header{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:8px;animation:fadeRotate 0.6s var(--ease-smooth);}
+.pomodoro-header h4{margin:0;font-size:22px;color:var(--accent);font-weight:700;}
+.pomodoro-info{font-size:14px;opacity:0.8;margin-bottom:24px;line-height:1.6;}
+
+.sound-selector{margin-bottom:24px;padding:16px;background:rgba(99,102,241,0.1);border-radius:16px;border:1px solid rgba(99,102,241,0.2);animation:scaleIn 0.6s var(--ease-smooth) 0.2s forwards;opacity:0;}
+.sound-selector h5{margin:0 0 12px 0;font-size:14px;color:var(--accent);text-transform:uppercase;letter-spacing:0.5px;}
+.sound-options{display:grid;grid-template-columns:1fr;gap:12px;}
+.sound-option{padding:14px 16px;border:2px solid rgba(99,102,241,0.3);border-radius:14px;cursor:pointer;transition:all 0.4s var(--ease-ultra);background:var(--card-dark);color:inherit;font-size:14px;font-weight:500;display:flex;align-items:center;justify-content:space-between;gap:8px;}
+body.light .sound-option{background:var(--card-light);}
+.sound-option:hover{border-color:var(--accent);transform:translateX(4px);background:rgba(99,102,241,0.1);}
+.sound-option.active{border:3px solid var(--accent);background:linear-gradient(135deg,rgba(99,102,241,0.2),rgba(139,92,246,0.15));color:white;box-shadow:0 0 0 4px rgba(99,102,241,0.3),0 8px 25px rgba(99,102,241,0.5);transform:scale(1.03);}
+.sound-option.active .sound-test-btn{background:white;color:var(--accent);}
+.sound-test-btn{padding:6px 12px;font-size:12px;background:rgba(99,102,241,0.2);border:none;border-radius:8px;color:var(--accent);cursor:pointer;transition:all 0.3s var(--ease-elastic);font-weight:600;}
+.sound-test-btn:hover{background:var(--accent);color:white;transform:scale(1.15);}
+
+.timer-mode{display:flex;gap:8px;margin-bottom:24px;justify-content:center;background:rgba(99,102,241,0.1);padding:6px;border-radius:16px;animation:scaleIn 0.6s var(--ease-smooth) 0.3s forwards;opacity:0;}
+.timer-mode-btn{flex:1;padding:10px 16px;border-radius:12px;border:none;background:transparent;cursor:pointer;font-size:14px;font-weight:600;transition:all 0.4s var(--ease-ultra);color:inherit;}
+.timer-mode-btn.active{background:var(--accent);color:white;box-shadow:0 4px 12px rgba(99,102,241,0.3);}
+
+.pomodoro-timer{display:flex;align-items:center;justify-content:center;margin-bottom:28px;animation:scaleIn 0.6s var(--ease-smooth) 0.4s forwards;opacity:0;}
+.timer-display{font-size:64px;font-weight:800;font-family:'Courier New',monospace;color:var(--accent);background:linear-gradient(135deg,rgba(99,102,241,0.1),rgba(139,92,246,0.1));padding:20px 40px;border-radius:24px;border:2px solid rgba(99,102,241,0.2);min-width:240px;text-align:center;box-shadow:inset 0 4px 20px rgba(99,102,241,0.1);letter-spacing:-2px;transition:all 0.4s var(--ease-smooth);}
+.timer-display{background:rgba(255,255,255,0.05);border-color:rgba(139,92,246,0.3);}
+
+.pomodoro-controls{display:flex;gap:12px;justify-content:center;animation:scaleIn 0.6s var(--ease-smooth) 0.5s forwards;opacity:0;}
+.pomodoro-btn{padding:14px 28px;border-radius:16px;border:none;cursor:pointer;font-size:16px;font-weight:700;transition:all 0.4s var(--ease-elastic);display:flex;align-items:center;gap:8px;}
+.pomodoro-btn.start{background:linear-gradient(135deg,var(--success),#059669);color:white;box-shadow:0 8px 20px rgba(16,185,129,0.4);}
+.pomodoro-btn.pause{background:linear-gradient(135deg,var(--warning),#d97706);color:white;box-shadow:0 8px 20px rgba(245,158,11,0.4);}
+.pomodoro-btn.reset{background:transparent;border:2px solid rgba(99,102,241,0.2);color:var(--accent);}
+.pomodoro-btn:hover{transform:translateY(-3px) scale(1.05);}
+.pomodoro-btn:active{transform:scale(0.95);}
+
+.favorites-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px;width:100%;max-width:1200px;margin:24px auto;padding:0 20px;}
+.favorite-card{background:var(--card-dark);padding:24px;border-radius:20px;box-shadow:var(--shadow);border:1px solid rgba(255,255,255,0.1);transition:all 0.5s var(--ease-elastic);animation:cardStagger 0.8s var(--ease-ultra) forwards;opacity:0;cursor:pointer;}
+body.light .favorite-card{background:var(--card-light);border-color:rgba(255,255,255,0.2);}
+.favorite-card:hover{transform:translateY(-8px) scale(1.02);box-shadow:0 20px 50px rgba(99,102,241,0.3);}
+.favorite-card .header{display:flex;align-items:center;gap:12px;margin-bottom:16px;padding-bottom:16px;border-bottom:2px solid rgba(99,102,241,0.2);}
+.favorite-card .header .icon{font-size:32px;transition:transform 0.4s var(--ease-elastic);}
+.favorite-card:hover .header .icon{transform:scale(1.25) rotate(12deg);}
+.favorite-card .header h3{margin:0;font-size:18px;color:var(--accent);flex:1;}
+.favorite-card .body{font-size:15px;line-height:1.7;opacity:0.9;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
+.favorite-card .actions{display:flex;gap:8px;margin-top:16px;}
+.favorite-card .remove-btn{padding:8px 16px;font-size:13px;background:transparent;border:2px solid var(--danger);color:var(--danger);border-radius:10px;cursor:pointer;transition:all 0.3s var(--ease-elastic);font-weight:600;}
+.favorite-card .remove-btn:hover{background:var(--danger);color:white;}
+
+.empty-favorites{text-align:center;padding:60px 20px;opacity:0.7;animation:favoritesReveal 1s var(--ease-ultra) forwards;}
+.empty-favorites .icon{font-size:80px;display:block;margin-bottom:20px;animation:float 3s ease-in-out infinite;}
+
+.fullview-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(15,23,42,0.8);backdrop-filter: blur(15px);-webkit-backdrop-filter: blur(15px);z-index:3000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.6s var(--ease-ultra);}
+.fullview-overlay.active{opacity:1;pointer-events:all;}
+
+.fullview-content{background:var(--card-dark);padding:48px;border-radius:32px;width:90%;max-width:700px;box-shadow:0 40px 100px rgba(0,0,0,0.4);transform:scale(0.8) translateY(50px);transition:transform 0.7s var(--ease-elastic);border:1px solid rgba(255,255,255,0.1);position:relative;max-height:85vh;overflow-y:auto;}
+body.light .fullview-content{background:var(--card-light);border-color:rgba(255,255,255,0.2);}
+.fullview-overlay.active .fullview-content{transform:scale(1) translateY(0);}
+
+.fullview-close{position:absolute;top:24px;right:24px;width:40px;height:40px;border-radius:50%;border:none;background:rgba(99,102,241,0.1);color:var(--accent);cursor:pointer;font-size:22px;display:flex;align-items:center;justify-content:center;transition:all 0.4s var(--ease-elastic);}
+.fullview-close:hover{background:var(--danger);color:white;transform:rotate(90deg) scale(1.1);}
+
+.fullview-header{display:flex;align-items:center;gap:16px;margin-bottom:24px;padding-bottom:20px;border-bottom:2px solid rgba(99,102,241,0.2);}
+.fullview-header .icon{font-size:48px;animation:scaleIn 0.7s var(--ease-elastic);}
+.fullview-header h2{margin:0;font-size:28px;color:var(--accent);font-weight:700;flex:1;}
+
+.fullview-body{font-size:18px;line-height:1.9;}
+.fullview-body p{margin:20px 0;}
+.fullview-body strong{color:var(--accent);font-weight:600;}
+
+.fullview-actions{display:flex;gap:12px;margin-top:32px;flex-wrap:wrap;}
+
+.info-box{
+position:fixed;
+top:72px;
+left:clamp(12px,3vw,20px);
+background:var(--card-dark);
+padding:24px;
+border-radius:24px;
+box-shadow:0 20px 50px rgba(0,0,0,0.2);
+max-width:min(90vw,340px);
+opacity:0;
+transform:translateY(-20px) scale(0.95);
+transition:all 0.5s var(--ease-elastic);
+z-index:1500;
+line-height:1.6;
+font-size:15px;
+border:1px solid rgba(255,255,255,0.1);
+display:none;
+backdrop-filter: blur(10px);
+}
+body.light .info-box{background:var(--card-light);border-color:rgba(0,0,0,0.05);}
+.info-box.info-show{display:block;opacity:1;transform:translateY(0) scale(1);}
+
+.text-hint{font-size:14px;opacity:0.7;margin-top:-8px;margin-bottom:8px;}
+.area-tags{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0;}
+.area-tag{padding:10px 18px;border-radius:20px;font-size:15px;cursor:pointer;transition:all 0.4s var(--ease-ultra);border:2px solid rgba(99,102,241,0.2);background:rgba(255,255,255,0.05);color:inherit;font-weight:500;}
+body.light .area-tag{background:rgba(255,255,255,0.5);border-color:rgba(99,102,241,0.1);}
+.area-tag:hover{border-color:var(--accent);transform:translateY(-2px);}
+.area-tag.selected{background:var(--accent);color:white;border-color:var(--accent);box-shadow:0 4px 15px rgba(99,102,241,0.3);}
+
+textarea{width:100%;padding:16px 20px;font-size:16px;border-radius:16px;border:2px solid rgba(99,102,241,0.2);background:rgba(255,255,255,0.05);color:inherit;transition:all 0.4s var(--ease-ultra);resize:vertical;min-height:140px;font-family:inherit;}
+body.light textarea{background:rgba(255,255,255,0.5);border-color:rgba(99,102,241,0.1);}
+textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 4px rgba(99,102,241,0.15);background:rgba(255,255,255,0.08);}
+body.light textarea:focus{background:rgba(255,255,255,0.8);}
+textarea::placeholder{color:rgba(255,255,255,0.4);}
+body.light textarea::placeholder{color:rgba(0,0,0,0.4);}
+
+@media(max-width:900px){
+.split-container{grid-template-columns:1fr;}
+.answer-panel{position:relative;top:0;min-height:auto;order:-1;margin-bottom:24px;}
+.problems-panel{max-height:none;}
+.favorites-grid{grid-template-columns:1fr;}
+.fullview-content{padding:32px;}
+}
+
+@media(max-width:768px){
+.big-btn{width:100%;margin:10px 0}
+.info-box{left:50%;transform:translateX(-50%) translateY(-20px) scale(0.95)}
+.info-box.info-show{transform:translateX(-50%) translateY(0) scale(1)}
+.checkbox-group{grid-template-columns:1fr}
+.timer-display{font-size:48px;padding:16px 32px;min-width:200px;}
+.fullview-content{padding:24px;border-radius:24px;}
+.fullview-header h2{font-size:22px;}
+.fullview-body{font-size:16px;}
+}
+
+::-webkit-scrollbar{width:10px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:#475569;border-radius:10px;border:2px solid transparent;background-clip:content-box;transition:background 0.3s ease;}
+body.light ::-webkit-scrollbar-thumb{background:#cbd5e1;}
+::-webkit-scrollbar-thumb:hover{background:#64748b;}
+</style>
+</head>
+<body>
+
+<!-- Фоновые изображения -->
+<div class="home-bg">
+<div class="bg-dark-image"></div>
+<div class="bg-light-image"></div>
+</div>
+
+<!-- Вспышка света -->
+<div class="light-flash" id="lightFlash"></div>
+
+<div class="progress-bar" id="progressBar"></div>
+
+<!-- ВЕРХНЯЯ ПАНЕЛЬ -->
+<div class="top-bar">
+<button class="info-btn-panel" onclick="toggleInfo()" aria-label="Информация о проекте" tabindex="0">i</button>
+<div class="top-bar-right">
+<button class="help-btn" onclick="openHelpModal()" aria-label="Как пользоваться" title="Как пользоваться?">
+<span class="icon">❓</span>
+<span class="text">Как пользоваться?</span>
+</button>
+<button class="theme-toggle-btn" onclick="toggleTheme()" aria-label="Переключить тему" title="Переключить тему" id="themeBtn">☀️</button>
+</div>
+</div>
+
+<div class="info-box" id="infoBox" role="dialog" aria-modal="false">
+<strong>АнтиПрокрастинация</strong><br><br>
+Проект создали:<br>
+• Коптяев Матвей Александрович (РСОб-1201)<br>
+• Преловский Константин Сергеевич (РСОб-1201)<br>
+• Гололобов Семён Сергеевич (РСОб-1202)<br><br>
+для дисциплины «Разработка коммуникационного проекта»<br>
+на основе проведённого опроса.
+</div>
+
+<!-- КНОПКА ТАЙМЕРА -->
+<button class="timer-btn-global" onclick="openTimerModal()" aria-label="Открыть таймер Помодоро" title="Таймер Помодоро">⏱️</button>
+
+<!-- Экран 1: Главная -->
+<div class="screen" id="home" role="region" aria-label="Главный экран">
+<h1 id="mainTitle" class="animate-in"></h1>
+<div class="subtitle animate-in-delay-1">
+Интерактивный инструмент на основе исследования. Пройдите опрос и получите персональные рекомендации.
+</div>
+
+<div class="quote-container animate-in-delay-2">
+<p class="quote-text" id="quoteText"></p>
+<p class="quote-author" id="quoteAuthor"></p>
+<div class="quote-dots" id="quoteDots"></div>
+</div>
+
+<button class="big-btn animate-in-delay-2" onclick="goTo('survey')" aria-label="Начать опрос">📋 Пройти опрос (2 мин)</button>
+<button class="big-btn animate-in-delay-3" onclick="goTo('choice')" style="background:linear-gradient(135deg,#64748b,#94a3b8);box-shadow:0 8px 20px rgba(100,116,139,0.3)">⚡ Быстрый старт</button>
+</div>
+
+<!-- Экран 2: Опрос -->
+<div class="screen hidden" id="survey" role="region" aria-label="Опрос">
+<div class="card">
+<div class="survey-progress"><div class="survey-progress-bar" id="surveyProgress"></div></div>
+
+<div class="survey-question" id="q1">
+<h3>❓ Сталкиваетесь ли вы с прокрастинацией?</h3>
+<div class="survey-options">
+<div class="survey-option" onclick="selectOption(this,'q1','regularly')"><input type="radio" name="q1" id="q1a"><label for="q1a">Да, регулярно</label></div>
+<div class="survey-option" onclick="selectOption(this,'q1','sometimes')"><input type="radio" name="q1" id="q1b"><label for="q1b">Иногда</label></div>
+<div class="survey-option" onclick="selectOption(this,'q1','rarely')"><input type="radio" name="q1" id="q1c"><label for="q1c">Редко</label></div>
+<div class="survey-option" onclick="selectOption(this,'q1','no')"><input type="radio" name="q1" id="q1d"><label for="q1d">Нет</label></div>
+</div>
+</div>
+
+<div class="survey-question hidden" id="q2">
+<h3>📚 В каких сферах вы чаще откладываете дела?</h3>
+<p style="opacity:0.7;font-size:14px;margin-bottom:12px;">(можно выбрать несколько)</p>
+<div class="checkbox-group">
+<div class="checkbox-option" onclick="toggleCheckbox(this,'q2','studies')"><input type="checkbox" id="q2a"><label>📖 Учёба</label></div>
+<div class="checkbox-option" onclick="toggleCheckbox(this,'q2','exams')"><input type="checkbox" id="q2b"><label>📝 Подготовка к экзаменам</label></div>
+<div class="checkbox-option" onclick="toggleCheckbox(this,'q2','projects')"><input type="checkbox" id="q2c"><label>💼 Личные проекты</label></div>
+<div class="checkbox-option" onclick="toggleCheckbox(this,'q2','work')"><input type="checkbox" id="q2d"><label>💼 Работа</label></div>
+<div class="checkbox-option" onclick="toggleCheckbox(this,'q2','household')"><input type="checkbox" id="q2e"><label>🏠 Домашние дела</label></div>
+<div class="checkbox-option" onclick="toggleCheckbox(this,'q2','other')"><input type="checkbox" id="q2f"><label>📌 Другое</label></div>
+</div>
+</div>
+
+<div class="survey-question hidden" id="q3">
+<h3>🎯 Что мешает вам начать?</h3>
+<p style="opacity:0.7;font-size:14px;margin-bottom:12px;">Выберите основные причины (можно несколько)</p>
+<div class="checkbox-group" id="causesContainer"></div>
+</div>
+
+<button class="big-btn" onclick="nextSurveyQuestion()" id="nextBtn">Далее →</button>
+<button class="big-btn hidden" onclick="completeSurvey()" id="completeBtn" style="background:linear-gradient(135deg,var(--success),#059669)">✅ Получить рекомендации</button>
+</div>
+</div>
+
+<!-- Экран 3: Результаты опроса -->
+<div class="screen hidden" id="surveyResult" role="region" aria-label="Результаты опроса">
+<div class="card">
+<h2>🎉 Ваш профиль прокрастинации</h2>
+<div class="stats-container">
+<div class="stat-card"><span class="stat-number" id="freqStat">-</span><span class="stat-label">Частота прокрастинации</span></div>
+<div class="stat-card"><span class="stat-number" id="areasStat">-</span><span class="stat-label">Проблемных сфер</span></div>
+<div class="stat-card"><span class="stat-number" id="causesStat">-</span><span class="stat-label">Основных причин</span></div>
+</div>
+<div class="profile-result" id="profileResult">
+<h3>📊 Персональные рекомендации</h3>
+<div id="profileAdvice"></div>
+</div>
+<button class="big-btn" onclick="goTo('custom')" style="margin-top:20px;">🔍 Получить детальный анализ</button>
+<button class="big-btn" onclick="goTo('home')" style="background:linear-gradient(135deg,#64748b,#94a3b8);box-shadow:0 8px 20px rgba(100,116,139,0.3)">🏠 На главную</button>
+</div>
+</div>
+
+<!-- Экран 4: Выбор формата -->
+<div class="screen hidden" id="choice" role="region" aria-label="Выбор формата">
+<h1 class="animate-in">Выберите формат</h1>
+<button class="big-btn animate-in-delay-1" onclick="goTo('custom')">✍️ Опиши свою проблему</button>
+<button class="big-btn animate-in-delay-2" onclick="goTo('list')">📋 Частые проблемы</button>
+<button class="big-btn animate-in-delay-3" onclick="goTo('favorites')" style="background:linear-gradient(135deg,var(--warning),#d97706);box-shadow:0 8px 20px rgba(245,158,11,0.4)">⭐ Избранное</button>
+<button class="big-btn animate-in-delay-3" onclick="goTo('home')" style="background:linear-gradient(135deg,#64748b,#94a3b8);box-shadow:0 8px 20px rgba(100,116,139,0.3)">🏠 На главную</button>
+</div>
+
+<!-- Экран 5: Своя проблема -->
+<div class="screen hidden" id="custom" role="region" aria-label="Описание проблемы">
+<div class="card">
+<h2>Опишите вашу ситуацию</h2>
+<textarea id="userText" rows="5" placeholder="Например: «Боюсь начать проект, потому что могу сделать неидеально»" aria-describedby="textHint"></textarea>
+<small id="textHint" class="text-hint">💡 Чем подробнее опишете — тем точнее будет рекомендация</small>
+<label style="font-size:14px;opacity:0.8;margin-top:8px;display:block;">В какой сфере задача?</label>
+<div class="area-tags" id="areaTags">
+<span class="area-tag" onclick="toggleAreaTag(this)">📖 Учёба</span>
+<span class="area-tag" onclick="toggleAreaTag(this)">📝 Экзамены</span>
+<span class="area-tag" onclick="toggleAreaTag(this)">💼 Работа</span>
+<span class="area-tag" onclick="toggleAreaTag(this)">💼 Проекты</span>
+<span class="area-tag" onclick="toggleAreaTag(this)">🏠 Дом</span>
+<span class="area-tag" onclick="toggleAreaTag(this)">📌 Другое</span>
+</div>
+<button class="big-btn" onclick="smartAnalyze()">🔍 Проанализировать</button>
+<div id="customResult" class="result" role="status" aria-live="polite"></div>
+<button class="big-btn" onclick="goTo('choice')" style="background:linear-gradient(135deg,#64748b,#94a3b8);box-shadow:0 8px 20px rgba(100,116,139,0.3)">← Назад</button>
+</div>
+</div>
+
+<!-- Экран 6: Частые проблемы -->
+<div class="screen hidden" id="list" role="region" aria-label="Частые проблемы">
+<div class="split-container">
+<div class="problems-panel">
+<div class="search-box"><input type="text" id="searchInput" placeholder="🔍 Поиск проблемы..." onkeyup="filterProblems(this)" aria-label="Поиск по списку проблем"></div>
+<h2>📋 Все проблемы</h2>
+<div class="problem-list" id="problemList"></div>
+</div>
+<div class="answer-panel">
+<div class="answer-placeholder" id="answerPlaceholder">
+<span class="icon" id="placeholderIcon">👈</span>
+<h3>Выберите проблему</h3>
+<p id="placeholderText">Нажмите на любую проблему из списка слева, чтобы получить рекомендацию на основе опроса.</p>
+</div>
+<div class="answer-content" id="answerContent">
+<div class="answer-header"><span class="icon" id="answerIcon"></span><h3 id="answerTitle"></h3></div>
+<div class="answer-body" id="answerBody"></div>
+<div class="action-buttons">
+<button class="copy-btn" onclick="copyAnswer()">📋 Скопировать рекомендацию</button>
+<button class="favorite-btn" onclick="toggleFavorite()" id="favoriteBtn">⭐ В избранное</button>
+</div>
+</div>
+</div>
+</div>
+<div style="text-align:center;margin-top:24px;">
+<button class="big-btn" onclick="goTo('choice')" style="background:linear-gradient(135deg,#64748b,#94a3b8);box-shadow:0 8px 20px rgba(100,116,139,0.3)">← Назад</button>
+</div>
+</div>
+
+<!-- Экран 7: Избранное -->
+<div class="screen hidden" id="favorites" role="region" aria-label="Избранное">
+<h1>⭐ Избранное</h1>
+<p style="opacity:0.7;text-align:center;max-width:600px;margin-bottom:20px;">Нажмите на карточку, чтобы просмотреть полную рекомендацию</p>
+<div class="favorites-grid" id="favoritesGrid"></div>
+<div style="text-align:center;margin-top:24px;">
+<button class="big-btn" onclick="goTo('home')" style="background:linear-gradient(135deg,#64748b,#94a3b8);box-shadow:0 8px 20px rgba(100,116,139,0.3)">🏠 На главную</button>
+</div>
+</div>
+
+<!-- МОДАЛКА: Как пользоваться + Глоссарий -->
+<div class="modal-overlay" id="helpModal">
+<div class="modal-content">
+<button class="modal-close-btn" onclick="closeHelpModal()">✕</button>
+<h2 class="modal-title">❓ Как пользоваться сайтом</h2>
+<div class="modal-body" style="text-align:left;">
+<div style="background:rgba(99,102,241,0.1);padding:20px;border-radius:16px;margin-bottom:20px;">
+<h3 style="color:var(--accent);margin-top:0;">📝 Пошаговая инструкция:</h3>
+<p><strong>1.</strong> Нажмите кнопку «📋 Пройти опрос» на главной странице</p>
+<p><strong>2.</strong> Ответьте на 3 простых вопроса о вашей ситуации</p>
+<p><strong>3.</strong> Получите персональные рекомендации</p>
+<p><strong>4.</strong> Или выберите «⚡ Быстрый старт» для доступа ко всем функциям</p>
+</div>
+
+<div class="glossary-section">
+<h3>📚 Глоссарий терминов</h3>
+<div class="glossary-item"><span class="glossary-term">Прокрастинация</span><span class="glossary-definition">Постоянное откладывание важных дел «на потом», несмотря на понимание негативных последствий.</span></div>
+<div class="glossary-item"><span class="glossary-term">Таймер Помодоро</span><span class="glossary-definition">Метод управления временем: 25 минут работы + 5 минут отдыха. Помогает сохранить концентрацию.</span></div>
+<div class="glossary-item"><span class="glossary-term">Дедлайн</span><span class="glossary-definition">Крайний срок выполнения задачи или проекта.</span></div>
+<div class="glossary-item"><span class="glossary-term">Перфекционизм</span><span class="glossary-definition">Стремление сделать всё идеально, что часто мешает начать работу.</span></div>
+<div class="glossary-item"><span class="glossary-term">Выгорание</span><span class="glossary-definition">Состояние эмоционального и физического истощения из-за длительного стресса.</span></div>
+<div class="glossary-item"><span class="glossary-term">Мотивация</span><span class="glossary-definition">Внутреннее желание действовать. Часто появляется уже после начала работы, а не до неё.</span></div>
+</div>
+</div>
+<div class="modal-buttons"><button class="modal-btn primary" onclick="closeHelpModal()">✅ Понятно!</button></div>
+</div>
+</div>
+
+<!-- МОДАЛКА: Поздравление -->
+<div class="modal-overlay" id="congratsModal">
+<div class="modal-content">
+<h2 class="modal-title" style="font-size:32px;">🎉 Поздравляем!</h2>
+<div class="modal-body">
+<p style="font-size:18px;margin-bottom:20px;">Вы один из тех счастливчиков, у кого нет проблем с прокрастинацией!</p>
+<p style="opacity:0.8;margin-bottom:24px;">Вот 5 советов как сохранить вашу продуктивность:</p>
+<div style="text-align:left;background:rgba(99,102,241,0.1);padding:20px;border-radius:16px;margin-bottom:24px;">
+<p style="margin:8px 0;">✅ <strong>1.</strong> Продолжайте начинать дела сразу</p>
+<p style="margin:8px 0;">✅ <strong>2.</strong> Делайте регулярные перерывы</p>
+<p style="margin:8px 0;">✅ <strong>3.</strong> Ставьте чёткие цели на день</p>
+<p style="margin:8px 0;">✅ <strong>4.</strong> Отмечайте свои достижения</p>
+<p style="margin:8px 0;">✅ <strong>5.</strong> Делитесь опытом с другими</p>
+</div>
+<p style="opacity:0.8;">Наши инструменты всё равно могут быть полезны!</p>
+</div>
+<div class="modal-buttons">
+<button class="modal-btn secondary" onclick="closeCongratsModal()">🏠 На главную</button>
+<button class="modal-btn primary" onclick="closeCongratsModalAndGoToChoice()">🛠 Попробовать инструменты</button>
+</div>
+</div>
+</div>
+
+<!-- МОДАЛКА ИЗБРАННОГО -->
+<div class="fullview-overlay" id="fullviewOverlay" onclick="closeFullview(event)">
+<div class="fullview-content" onclick="event.stopPropagation()">
+<button class="fullview-close" onclick="closeFullviewDirect()">✕</button>
+<div class="fullview-header"><span class="icon" id="fullviewIcon"></span><h2 id="fullviewTitle"></h2></div>
+<div class="fullview-body" id="fullviewBody"></div>
+<div class="fullview-actions"><button class="copy-btn" onclick="copyFullview()">📋 Скопировать</button><button class="favorite-btn" onclick="removeFromFullview()" id="fullviewRemoveBtn">❌ Удалить из избранного</button></div>
+</div>
+</div>
+
+<!-- МОДАЛКА ТАЙМЕРА -->
+<div class="timer-modal-overlay" id="timerModal" onclick="closeTimerModal(event)">
+<div class="timer-modal-content">
+<button class="timer-modal-close" onclick="closeTimerModalDirect()">✕</button>
+<div class="pomodoro-header"><span style="font-size:32px;">🍅</span><h4>Таймер Помодоро</h4></div>
+<p class="pomodoro-info">Метод помогает преодолеть прокрастинацию, разбивая работу на короткие интервалы.</p>
+<div class="sound-selector">
+<h5>🔔 Звук уведомления</h5>
+<div class="sound-options">
+<div class="sound-option" data-sound="chime" onclick="selectSound('chime',this)"><span>✨ Чириканье</span><button class="sound-test-btn" onclick="event.stopPropagation();testSound('chime')">🔊 Тест</button></div>
+<div class="sound-option" data-sound="soft" onclick="selectSound('soft',this)"><span>🌊 Мягкий тон</span><button class="sound-test-btn" onclick="event.stopPropagation();testSound('soft')">🔊 Тест</button></div>
+<div class="sound-option" data-sound="piano" onclick="selectSound('piano',this)"><span>🎹 Пианино</span><button class="sound-test-btn" onclick="event.stopPropagation();testSound('piano')">🔊 Тест</button></div>
+</div>
+</div>
+<div class="timer-mode">
+<button class="timer-mode-btn active" onclick="setTimerMode('work',this)">Работа (25 мин)</button>
+<button class="timer-mode-btn" onclick="setTimerMode('break',this)">Отдых (5 мин)</button>
+</div>
+<div class="pomodoro-timer"><div class="timer-display" id="timerDisplay">25:00</div></div>
+<div class="pomodoro-controls">
+<button class="pomodoro-btn start" onclick="startTimer()" id="startBtn">▶️ Старт</button>
+<button class="pomodoro-btn pause" onclick="pauseTimer()" id="pauseBtn" style="display:none;">⏸️ Пауза</button>
+<button class="pomodoro-btn reset" onclick="resetTimer()">🔄 Сброс</button>
+</div>
+</div>
+</div>
+
+<script>
+const defaultQuotes = [
+{text:"Начни с малого, но начни сегодня.",author:"Неизвестный"},
+{text:"Прогресс важнее совершенства.",author:"Неизвестный"},
+{text:"5 минут работы лучше 5 часов прокрастинации.",author:"Неизвестный"},
+{text:"Дорога в тысячу миль начинается с первого шага.",author:"Лао-цзы"},
+{text:"Лучшее время чтобы начать — было вчера, следующее лучшее — сейчас.",author:"Неизвестный"},
+{text:"Не жди идеального момента. Возьми момент и сделай его идеальным.",author:"Неизвестный"},
+{text:"Маленькие шаги каждый день приводят к большим результатам.",author:"Неизвестный"},
+{text:"Дисциплина — это мост между целями и достижениями.",author:"Джим Рон"},
+{text:"Ты не должен быть великим, чтобы начать. Но ты должен начать, чтобы стать великим.",author:"Зиг Зиглар"},
+{text:"Сделай сегодня то, за что будущее скажет тебе спасибо.",author:"Неизвестный"}
+];
+
+const causes14=["Страх неудачи","Страх оценки окружающих","Перфекционизм","Усталость / нехватка энергии","Отвлечение на социальные сети","Не понимаю, с чего начать","Слишком много задач","Нет мотивации","Давят сроки / дедлайны","Скучная задача","Не вижу смысла","Эмоциональное выгорание","Низкая самооценка","Отсутствие дисциплины"];
+
+const data={
+"Страх неудачи":{icon:"😰",advice:"<p><strong>Что это:</strong> Вы избегаете действий из-за боязни негативного результата.</p><p><strong>Почему:</strong> Страх ошибки блокирует старт — мозг воспринимает задачу как угрозу.</p><p><strong>Что делать:</strong> Начните с микро-шагов (5-10 минут). Разрешите себе черновик — «плохо сделанное» лучше идеальной пустоты.</p>"},
+"Страх оценки окружающих":{icon:"👁️",advice:"<p><strong>Что это:</strong> Вас сдерживает мнение других людей, боязнь критики.</p><p><strong>Почему:</strong> Социальная тревожность заставляет фокусироваться на внешнем одобрении.</p><p><strong>Что делать:</strong> Разделяйте личность и результат. Работайте в «тихом режиме». Большинство людей заняты своими делами.</p>"},
+"Перфекционизм":{icon:"✨",advice:"<p><strong>Что это:</strong> Завышенные стандарты мешают начать.</p><p><strong>Почему:</strong> Перфекционизм создаёт нереалистичные ожидания.</p><p><strong>Что делать:</strong> Создайте черновик за 20 минут. Сначала «сделать», потом «улучшить». Прогресс важнее совершенства.</p>"},
+"Усталость / нехватка энергии":{icon:"😴",advice:"<p><strong>Что это:</strong> Организм сигнализирует о перегрузке.</p><p><strong>Почему:</strong> Хронический недосып и отсутствие перерывов истощают ресурсы.</p><p><strong>Что делать:</strong> 7-8 часов сна обязательно. Перерывы каждые 45-60 минут. 15 минут прогулки восстанавливают энергию.</p>"},
+"Отвлечение на социальные сети":{icon:"📱",advice:"<p><strong>Что это:</strong> Уведомления и скроллинг прерывают фокус.</p><p><strong>Почему:</strong> Соцсети дают мгновенное дофаминовое вознаграждение.</p><p><strong>Что делать:</strong> Режим «Не беспокоить». Уберите телефон в другую комнату. 25 мин работы → 5 мин на сообщения.</p>"},
+"Не понимаю, с чего начать":{icon:"🧭",advice:"<p><strong>Что это:</strong> Задача кажется слишком большой, нет точки входа.</p><p><strong>Почему:</strong> Неопределённость создаёт когнитивную нагрузку.</p><p><strong>Что делать:</strong> Определите микро-шаг: «открыть документ», «написать заголовок». Запишите план из 3-5 пунктов.</p>"},
+"Слишком много задач":{icon:"📋",advice:"<p><strong>Что это:</strong> Ощущение завала, много дел одновременно.</p><p><strong>Почему:</strong> Перегрузка выбором парализует.</p><p><strong>Что делать:</strong> Правило «1-3-5»: 1 большая, 3 средних, 5 мелких задач. Выберите один приоритет на сегодня.</p>"},
+"Нет мотивации":{icon:"🔋",advice:"<p><strong>Что это:</strong> Нет внутреннего желания начинать.</p><p><strong>Почему:</strong> Мотивация — следствие действия, а не причина.</p><p><strong>Что делать:</strong> «Поработаю 5 минут». Ставьте микро-цели. Движение создаёт мотивацию.</p>"},
+"Давят сроки / дедлайны":{icon:"⏰",advice:"<p><strong>Что это:</strong> Сроки горят, давление времени усиливает тревогу.</p><p><strong>Почему:</strong> Крупный дедлайн воспринимается как одна огромная задача.</p><p><strong>Что делать:</strong> Разбейте на микро-этапы с мини-сроками. Отмечайте прогресс визуально. Начните с простого.</p>"},
+"Скучная задача":{icon:"🎮",advice:"<p><strong>Что это:</strong> Задача кажется монотонной, рутинной.</p><p><strong>Почему:</strong> Рутина не даёт дофаминового отклика.</p><p><strong>Что делать:</strong> Добавьте элемент игры: таймер, соревнование. Включите музыку. Награждайте себя после.</p>"},
+"Не вижу смысла":{icon:"🎯",advice:"<p><strong>Что это:</strong> Непонятно, зачем это нужно.</p><p><strong>Почему:</strong> Нет связи между действием и целями.</p><p><strong>Что делать:</strong> Свяжите с личной целью. Напишите «Зачем мне это?» и найдите 3 причины.</p>"},
+"Эмоциональное выгорание":{icon:"🔥",advice:"<p><strong>Что это:</strong> Хроническое истощение, апатия, пустота.</p><p><strong>Почему:</strong> Длительный стресс без восстановления истощает ресурсы.</p><p><strong>Что делать:</strong> Возьмите перерыв на 1-3 дня. Обратитесь за поддержкой. Восстановите сон, питание, движение.</p>"},
+"Низкая самооценка":{icon:"💙",advice:"<p><strong>Что это:</strong> Неуверенность в своих силах, «я не справлюсь».</p><p><strong>Почему:</strong> Негативный внутренний диалог подрывает веру.</p><p><strong>Что делать:</strong> Фиксируйте маленькие победы. «Я пока не умею, но научусь». Сравнивайте только с собой вчерашним.</p>"},
+"Отсутствие дисциплины":{icon:"⚙️",advice:"<p><strong>Что это:</strong> Трудно заставить себя начать, нет системы.</p><p><strong>Почему:</strong> Дисциплина — навык, а не врождённая черта.</p><p><strong>Что делать:</strong> Ритуал начала: время + место + действие. «Правило 2 минут». Начинайте с 10 минут в день.</p>"}
+};
+
+const problemIcons={"Страх неудачи":"😰","Страх оценки окружающих":"👁️","Перфекционизм":"✨","Усталость / нехватка энергии":"😴","Отвлечение на социальные сети":"📱","Не понимаю, с чего начать":"🧭","Слишком много задач":"📋","Нет мотивации":"🔋","Давят сроки / дедлайны":"⏰","Скучная задача":"🎮","Не вижу смысла":"🎯","Эмоциональное выгорание":"🔥","Низкая самооценка":"💙","Отсутствие дисциплины":"⚙️"};
+
+const smartData=[
+{category:"Страх неудачи",keywords:["страх","неудача","ошибка","боюсь","провал","не получится","страшно"],advice:data["Страх неудачи"].advice},
+{category:"Страх оценки окружающих",keywords:["оценка","критика","мнение","смотрят","осуждают","что подумают","стыдно"],advice:data["Страх оценки окружающих"].advice},
+{category:"Перфекционизм",keywords:["идеально","перфекционизм","совершенно","идеальная","безупречно","должно быть"],advice:data["Перфекционизм"].advice},
+{category:"Усталость / нехватка энергии",keywords:["усталость","устал","нет сил","переутомление","вымотал","энергии","сон"],advice:data["Усталость / нехватка энергии"].advice},
+{category:"Отвлечение на социальные сети",keywords:["соцсети","телефон","инстаграм","тикток","youtube","отвлекают","скролл"],advice:data["Отвлечение на социальные сети"].advice},
+{category:"Не понимаю, с чего начать",keywords:["начать","с чего","не знаю","непонятно","неясно","план","шаг"],advice:data["Не понимаю, с чего начать"].advice},
+{category:"Слишком много задач",keywords:["много","задач","дел","завал","всё сразу","хаос","приоритеты"],advice:data["Слишком много задач"].advice},
+{category:"Нет мотивации",keywords:["мотивация","не хочу","лениво","не хочется","апатия","нет желания"],advice:data["Нет мотивации"].advice},
+{category:"Давят сроки / дедлайны",keywords:["дедлайн","срок","время","горит","давят","последний","поздно"],advice:data["Давят сроки / дедлайны"].advice},
+{category:"Скучная задача",keywords:["скучно","неинтересно","рутина","монотонно","занудно","тоска","нудно"],advice:data["Скучная задача"].advice},
+{category:"Не вижу смысла",keywords:["смысл","зачем","бессмысленно","ненужно","не понимаю зачем","цель"],advice:data["Не вижу смысла"].advice},
+{category:"Эмоциональное выгорание",keywords:["выгорание","выгораю","опустошение","ничего не радует","эмоции"],advice:data["Эмоциональное выгорание"].advice},
+{category:"Низкая самооценка",keywords:["самооценка","не верю","не справлюсь","недостаточно","плохой","не могу"],advice:data["Низкая самооценка"].advice},
+{category:"Отсутствие дисциплины",keywords:["дисциплина","не могу заставить","режим","система","привычка","организованность"],advice:data["Отсутствие дисциплины"].advice}
+];
+
+let surveyAnswers={q1:null,q2:[],q3:[]};
+let currentQuestion=1;
+let currentAnswerText='';
+let currentProblemKey='';
+let favorites=JSON.parse(localStorage.getItem('antiProcrastination_favorites')||'[]');
+let timerInterval=null;
+let timerSeconds=25*60;
+let timerRunning=false;
+let timerMode='work';
+let selectedSound='chime';
+let currentFullviewKey='';
+let currentQuoteIndex=0;
+let quoteInterval=null;
+
+window.addEventListener('DOMContentLoaded', function(){
+createInteractiveTitle();
+showQuote();
+startQuoteRotation();
+updateThemeButton();
+updatePlaceholderText();
+setTimeout(function(){
+var defaultSound=document.querySelector('.sound-option[data-sound="chime"]');
+if(defaultSound) defaultSound.classList.add('active');
+},600);
+});
+
+function updatePlaceholderText(){
+const icon=document.getElementById('placeholderIcon');
+const text=document.getElementById('placeholderText');
+const isMobile=window.innerWidth<=900;
+if(isMobile){icon.textContent='👇';text.textContent='Нажмите на любую проблему из списка внизу, чтобы получить рекомендацию на основе опроса.';}
+else{icon.textContent='👈';text.textContent='Нажмите на любую проблему из списка слева, чтобы получить рекомендацию на основе опроса.';}
+}
+window.addEventListener('resize',updatePlaceholderText);
+
+function toggleTheme(){
+document.getElementById('lightFlash').classList.add('active');
+setTimeout(()=>document.getElementById('lightFlash').classList.remove('active'),300);
+setTimeout(()=>{
+document.body.classList.toggle("light");
+localStorage.setItem("antiProcrastination_theme",document.body.classList.contains("light")?"light":"dark");
+updateThemeButton();
+},150);
+}
+
+function updateThemeButton(){
+document.getElementById('themeBtn').textContent = document.body.classList.contains("light") ? '🌙' : '☀️';
+}
+
+function openHelpModal(){document.getElementById('helpModal').classList.add('active');}
+function closeHelpModal(){document.getElementById('helpModal').classList.remove('active');}
+
+function showCongratsModal(){
+startConfetti();
+document.getElementById('congratsModal').classList.add('active');
+}
+function closeCongratsModal(){document.getElementById('congratsModal').classList.remove('active');goTo('home');}
+function closeCongratsModalAndGoToChoice(){document.getElementById('congratsModal').classList.remove('active');goTo('choice');}
+
+function startConfetti(){
+const colors=['#6366f1','#8b5cf6','#10b981','#f59e0b','#ef4444','#ec4899'];
+for(let i=0;i<100;i++){
+const conf=document.createElement('div');
+conf.style.cssText=`position:fixed;width:10px;height:10px;border-radius:50%;background:${colors[Math.floor(Math.random()*colors.length)]};left:${Math.random()*100}vw;top:-10px;pointer-events:none;z-index:9999;animation:fall ${2+Math.random()*3}s linear forwards;`;
+document.body.appendChild(conf);
+setTimeout(()=>conf.remove(),5000);
+}
+}
+
+function selectOption(el,q,value){
+document.querySelectorAll('#'+q+' .survey-option').forEach(o=>o.classList.remove('selected'));
+el.classList.add('selected');
+el.querySelector('input').checked=true;
+surveyAnswers[q]=value;
+if(q==='q1' && value==='no') setTimeout(showCongratsModal,500);
+}
+
+function toggleCheckbox(el,q,value){
+el.classList.toggle('selected');
+const cb=el.querySelector('input');
+cb.checked=!cb.checked;
+if(cb.checked){if(!surveyAnswers[q].includes(value))surveyAnswers[q].push(value);}
+else{surveyAnswers[q]=surveyAnswers[q].filter(v=>v!==value);}
+}
+
+function nextSurveyQuestion(){
+if(currentQuestion===1&&surveyAnswers.q1){
+if(surveyAnswers.q1==='no') return;
+document.getElementById('q1').classList.add('hidden');
+document.getElementById('q2').classList.remove('hidden');
+currentQuestion=2;
+updateSurveyProgress(50);
+}else if(currentQuestion===2&&surveyAnswers.q2.length>0){
+document.getElementById('q2').classList.add('hidden');
+document.getElementById('q3').classList.remove('hidden');
+currentQuestion=3;
+updateSurveyProgress(100);
+document.getElementById('nextBtn').classList.add('hidden');
+document.getElementById('completeBtn').classList.remove('hidden');
+}else{alert('Пожалуйста, выберите вариант ответа!');}
+}
+
+function updateSurveyProgress(percent){document.getElementById('surveyProgress').style.width=percent+'%';}
+
+function completeSurvey(){goTo('surveyResult');generateProfile();}
+
+function generateProfile(){
+const freqMap={regularly:'Регулярно',sometimes:'Иногда',rarely:'Редко',no:'Нет'};
+document.getElementById('freqStat').textContent=freqMap[surveyAnswers.q1]||'-';
+document.getElementById('areasStat').textContent=surveyAnswers.q2.length;
+document.getElementById('causesStat').textContent=surveyAnswers.q3.length;
+let adviceHTML='';
+surveyAnswers.q3.slice(0,3).forEach(cause=>{
+if(data[cause]) adviceHTML+=`<div style="margin:16px 0;padding:16px;background:rgba(99,102,241,0.1);border-radius:12px;border-left:3px solid var(--accent);"><strong style="color:var(--accent);">${problemIcons[cause]} ${cause}</strong>${data[cause].advice}</div>`;
+});
+document.getElementById('profileAdvice').innerHTML=adviceHTML||'<p>Вы не выбрали конкретные причины. Рекомендуем начать с раздела «Частые проблемы» и изучить все 14 категорий.</p>';
+}
+
+function goTo(id){
+const progress={home:20,survey:40,surveyResult:60,choice:60,custom:80,list:80,favorites:80};
+document.getElementById('progressBar').style.width=(progress[id]||20)+'%';
+document.querySelectorAll(".screen").forEach(s=>s.classList.add("hidden"));
+setTimeout(()=>document.getElementById(id).classList.remove("hidden"),50);
+window.scrollTo({top:0,behavior:'smooth'});
+document.getElementById("infoBox").classList.remove("info-show");
+if(id==='home') resetHomeAnimations();
+else if(id==='choice') resetChoiceAnimations();
+else if(id==='favorites') renderFavorites();
+}
+
+function resetHomeAnimations(){
+document.querySelectorAll('#home .animate-in, #home .animate-in-delay-1, #home .animate-in-delay-2, #home .animate-in-delay-3').forEach(el=>{
+el.style.animation='none';el.offsetHeight;el.style.animation='';
+});
+createInteractiveTitle();
+}
+function resetChoiceAnimations(){
+document.querySelectorAll('#choice .animate-in, #choice .animate-in-delay-1, #choice .animate-in-delay-2, #choice .animate-in-delay-3').forEach(el=>{
+el.style.animation='none';el.offsetHeight;el.style.animation='';
+});
+}
+
+function toggleInfo(){document.getElementById("infoBox").classList.toggle("info-show");}
+
+function createInteractiveTitle(){
+const title=document.getElementById('mainTitle');
+title.innerHTML='';
+'АнтиПрокрастинация'.split('').forEach((char,i)=>{
+const span=document.createElement('span');
+span.className='letter';
+span.textContent=char;
+span.style.animationDelay=(i*0.05)+'s';
+span.style.animation='letter-float 3s ease-in-out infinite';
+title.appendChild(span);
+});
+}
+
+function showQuote(){
+const quote=defaultQuotes[currentQuoteIndex];
+document.getElementById('quoteText').classList.add('fade');
+setTimeout(()=>{
+document.getElementById('quoteText').textContent=`"${quote.text}"`;
+document.getElementById('quoteAuthor').textContent=`— ${quote.author}`;
+document.getElementById('quoteText').classList.remove('fade');
+},500);
+const dotsContainer=document.getElementById('quoteDots');
+dotsContainer.innerHTML='';
+for(let i=0;i<defaultQuotes.length;i++){
+const dot=document.createElement('div');
+dot.className='quote-dot'+(i===currentQuoteIndex?' active':'');
+dotsContainer.appendChild(dot);
+}
+}
+function startQuoteRotation(){
+quoteInterval=setInterval(()=>{
+currentQuoteIndex=(currentQuoteIndex+1)%defaultQuotes.length;
+showQuote();
+},7000);
+}
+
+function filterProblems(input){const val=input.value.toLowerCase();document.querySelectorAll(".problem-item").forEach(b=>b.style.display=b.innerText.toLowerCase().includes(val)?"flex":"none");}
+
+const problemList=document.getElementById("problemList");
+const answerPlaceholder=document.getElementById("answerPlaceholder");
+const answerContent=document.getElementById("answerContent");
+
+for(const key in data){
+const item=document.createElement("div");
+item.className="problem-item";
+item.innerHTML=`<span class="icon">${data[key].icon}</span><span style="flex:1">${key}</span>`;
+item.onclick=()=>{
+document.querySelectorAll(".problem-item").forEach(i=>i.classList.remove('active'));
+item.classList.add('active');
+answerPlaceholder.classList.add('hidden');
+answerContent.classList.remove('show');
+document.getElementById('answerIcon').textContent=data[key].icon;
+document.getElementById('answerTitle').textContent=key;
+document.getElementById('answerBody').innerHTML=data[key].advice;
+currentAnswerText=`${key}: ${data[key].advice.replace(/<[^>]*>/g,' ')}`;
+currentProblemKey=key;
+updateFavoriteButton();
+setTimeout(()=>answerContent.classList.add('show'),50);
+if(window.innerWidth<=900) answerContent.scrollIntoView({behavior:'smooth',block:'start'});
+};
+problemList.appendChild(item);
+}
+
+function toggleFavorite(){
+if(!currentProblemKey) return;
+const idx=favorites.indexOf(currentProblemKey);
+idx===-1?favorites.push(currentProblemKey):favorites.splice(idx,1);
+localStorage.setItem('antiProcrastination_favorites',JSON.stringify(favorites));
+updateFavoriteButton();
+}
+function updateFavoriteButton(){
+if(!currentProblemKey) return;
+const btn=document.getElementById('favoriteBtn');
+if(favorites.includes(currentProblemKey)){btn.classList.add('active');btn.innerHTML='⭐ В избранном';}
+else{btn.classList.remove('active');btn.innerHTML='⭐ В избранное';}
+}
+
+function renderFavorites(){
+const grid=document.getElementById('favoritesGrid');
+grid.innerHTML='';
+if(favorites.length===0){
+grid.innerHTML='<div class="empty-favorites" style="grid-column:1/-1;"><span class="icon">⭐</span><h3>Нет избранных проблем</h3><p>Добавляйте рекомендации в избранное, чтобы они появились здесь.</p></div>';
+return;
+}
+favorites.forEach((key,i)=>{
+if(data[key]){
+const card=document.createElement("div");
+card.className="favorite-card";
+card.style.animationDelay=(i*0.1)+'s';
+card.onclick=()=>openFullview(key);
+card.innerHTML=`<div class="header"><span class="icon">${data[key].icon}</span><h3>${key}</h3></div><div class="body">${data[key].advice.replace(/<[^>]*>/g,' ').substring(0,150)}...</div><div class="actions"><button class="remove-btn" onclick="event.stopPropagation();removeFromFavorites('${key}')">❌ Удалить</button></div>`;
+grid.appendChild(card);
+}
+});
+}
+function removeFromFavorites(key){favorites=favorites.filter(k=>k!==key);localStorage.setItem('antiProcrastination_favorites',JSON.stringify(favorites));renderFavorites();}
+
+function openFullview(key){
+currentFullviewKey=key;
+document.getElementById('fullviewIcon').textContent=data[key].icon;
+document.getElementById('fullviewTitle').textContent=key;
+document.getElementById('fullviewBody').innerHTML=data[key].advice;
+document.getElementById('fullviewOverlay').classList.add('active');
+document.body.style.overflow='hidden';
+}
+function closeFullview(e){if(e.target.id==='fullviewOverlay') closeFullviewDirect();}
+function closeFullviewDirect(){document.getElementById('fullviewOverlay').classList.remove('active');document.body.style.overflow='';}
+function removeFromFullview(){if(currentFullviewKey){removeFromFavorites(currentFullviewKey);closeFullviewDirect();}}
+
+function copyFullview(){
+if(currentFullviewKey){
+navigator.clipboard.writeText(`${currentFullviewKey}: ${data[currentFullviewKey].advice.replace(/<[^>]*>/g,' ')}`).then(()=>{
+const btn=document.querySelector('.fullview-actions .copy-btn');
+btn.textContent='✅ Скопировано!';setTimeout(()=>btn.textContent='📋 Скопировать',2000);
+});
+}
+}
+function copyAnswer(){
+if(!currentAnswerText) return;
+navigator.clipboard.writeText(currentAnswerText).then(()=>{
+const btn=document.querySelector('.copy-btn');
+btn.textContent='✅ Скопировано!';btn.classList.add('copied');
+setTimeout(()=>{btn.textContent='📋 Скопировать рекомендацию';btn.classList.remove('copied');},2000);
+});
+}
+
+function smartAnalyze(){
+const text=document.getElementById("userText").value.toLowerCase().trim();
+const result=document.getElementById("customResult");
+if(!text){result.innerHTML="<strong>⚠️ Подсказка:</strong> Опишите ситуацию подробнее.";result.classList.add("show");return;}
+result.innerHTML="<div class='loader'><div class='loader-bar'></div><div class='loader-text'>Анализируем...</div></div>";
+result.classList.remove("show");
+setTimeout(()=>{
+let matched=null,maxScore=0;
+for(const item of smartData){
+let score=0;
+for(const kw of item.keywords) if(text.includes(kw)) score++;
+if(score>maxScore){maxScore=score;matched=item;}
+}
+if(matched&&maxScore>=1) result.innerHTML=`<strong>${problemIcons[matched.category]} ${matched.category}:</strong>${matched.advice}<button class='copy-btn' onclick='copyText(this)'>📋 Скопировать</button>`;
+else result.innerHTML="<strong>💭 Не удалось определить</strong><p>Опишите подробнее или выберите из «Частые проблемы».</p><button class='copy-btn' onclick='copyText(this)'>📋 Скопировать</button>";
+result.classList.add("show");
+},1100);
+}
+function copyText(btn){
+const text=btn.closest('.result').innerText.replace('📋 Скопировать','').trim();
+navigator.clipboard.writeText(text).then(()=>{btn.textContent='✅ Скопировано!';btn.classList.add('copied');setTimeout(()=>{btn.textContent='📋 Скопировать';btn.classList.remove('copied');},2000);});
+}
+function toggleAreaTag(el){el.classList.toggle('selected');}
+
+document.getElementById('userText').addEventListener('keydown',e=>{if(e.ctrlKey&&e.key==='Enter') smartAnalyze();});
+
+function openTimerModal(){document.getElementById('timerModal').classList.add('active');document.body.style.overflow='hidden';updateSoundSelection();}
+function closeTimerModal(e){if(e.target.id==='timerModal'){document.getElementById('timerModal').classList.remove('active');document.body.style.overflow='';}}
+function closeTimerModalDirect(){document.getElementById('timerModal').classList.remove('active');document.body.style.overflow='';}
+
+function selectSound(sound,el){
+selectedSound=sound;
+document.querySelectorAll('.sound-option').forEach(o=>o.classList.remove('active'));
+el.classList.add('active');
+}
+function updateSoundSelection(){
+document.querySelectorAll('.sound-option').forEach(o=>{
+o.classList.remove('active');
+if(o.getAttribute('data-sound')===selectedSound) o.classList.add('active');
+});
+}
+function testSound(sound){
+selectedSound=sound;
+playSound();
+document.querySelectorAll('.sound-option').forEach(o=>{
+o.classList.remove('active');
+if(o.getAttribute('data-sound')===sound) o.classList.add('active');
+});
+}
+
+function updateTimerDisplay(){
+const m=Math.floor(timerSeconds/60),s=timerSeconds%60;
+document.getElementById('timerDisplay').textContent=`${m<10?'0':''}${m}:${s<10?'0':''}${s}`;
+}
+function setTimerMode(mode,el){
+timerMode=mode;
+document.querySelectorAll('.timer-mode-btn').forEach(b=>b.classList.remove('active'));
+el.classList.add('active');
+timerSeconds=mode==='work'?1500:300;
+updateTimerDisplay();
+pauseTimer();
+}
+function startTimer(){
+if(timerRunning) return;
+timerRunning=true;
+document.getElementById('startBtn').style.display='none';
+document.getElementById('pauseBtn').style.display='inline-flex';
+timerInterval=setInterval(()=>{
+if(timerSeconds>0){timerSeconds--;updateTimerDisplay();}
+else{
+clearInterval(timerInterval);timerRunning=false;
+document.getElementById('startBtn').style.display='inline-flex';
+document.getElementById('pauseBtn').style.display='none';
+playSound();
+alert(timerMode==='work'?'🍅 Время работы закончено! Сделайте перерыв 5 минут.':'☕ Отдых окончен! Пора возвращаться к работе.');
+setTimerMode(timerMode==='work'?'break':'work', document.querySelector(`.timer-mode-btn[onclick*="${timerMode==='work'?'break':'work'}"]`));
+}
+},1000);
+}
+function pauseTimer(){
+if(!timerRunning) return;
+clearInterval(timerInterval);timerRunning=false;
+document.getElementById('startBtn').style.display='inline-flex';
+document.getElementById('startBtn').innerHTML='▶️ Продолжить';
+document.getElementById('pauseBtn').style.display='none';
+}
+function resetTimer(){
+pauseTimer();
+timerSeconds=timerMode==='work'?1500:300;
+updateTimerDisplay();
+document.getElementById('startBtn').innerHTML='▶️ Старт';
+}
+
+function playSound(){
+try{
+const ctx=new(window.AudioContext||window.webkitAudioContext)();
+const osc=ctx.createOscillator(), gain=ctx.createGain();
+osc.connect(gain);gain.connect(ctx.destination);
+if(selectedSound==='chime'){osc.type='triangle';osc.frequency.setValueAtTime(880,ctx.currentTime);osc.frequency.setValueAtTime(1100,ctx.currentTime+0.1);osc.frequency.setValueAtTime(1320,ctx.currentTime+0.2);gain.gain.setValueAtTime(0.2,ctx.currentTime);gain.gain.exponentialRampToValueAtTime(0.01,ctx.currentTime+1);}
+else if(selectedSound==='soft'){osc.type='sine';osc.frequency.setValueAtTime(440,ctx.currentTime);gain.gain.setValueAtTime(0.2,ctx.currentTime);gain.gain.linearRampToValueAtTime(0.01,ctx.currentTime+2);}
+else{osc.type='sine';osc.frequency.setValueAtTime(523.25,ctx.currentTime);osc.frequency.setValueAtTime(659.25,ctx.currentTime+0.15);osc.frequency.setValueAtTime(783.99,ctx.currentTime+0.3);gain.gain.setValueAtTime(0.25,ctx.currentTime);gain.gain.exponentialRampToValueAtTime(0.01,ctx.currentTime+1.5);}
+osc.start();osc.stop(ctx.currentTime+2);
+}catch(e){console.log('Audio error',e);}
+}
+
+const causesContainer=document.getElementById("causesContainer");
+causes14.forEach(cause=>{
+const div=document.createElement("div");
+div.className="checkbox-option";
+div.onclick=()=>toggleCheckbox(div,'q3',cause);
+div.innerHTML=`<input type="checkbox"><label>${cause}</label>`;
+causesContainer.appendChild(div);
+});
+
+document.addEventListener('keydown',e=>{
+if(e.key==='Escape'){
+document.getElementById("infoBox").classList.remove("info-show");
+closeTimerModalDirect();closeFullviewDirect();closeHelpModal();
+document.getElementById('congratsModal').classList.remove('active');
+}
+});
+
+updateTimerDisplay();
+</script>
+
+</body>
+</html>
